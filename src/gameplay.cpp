@@ -1,42 +1,43 @@
 #include <iostream>
-#include "gameplay.h"
 #include <algorithm>
-#include <iostream>
+#include "gameplay.h"
 
-// التنفيذ بتاع الـ Constructor
+using namespace std;
+
+// Part 1 - Amy
+// Constructor: initializes the GameWorld with a PhysicsEngine
 GameWorld::GameWorld(PhysicsEngine* engine) : physicsEngine(engine) {}
 
-void GameWorld::spawnEntity(Entity* entity) {
-    if (entity) {
-        entities.push_back(entity);
+// Part 1 - Amy
+// Destructor: cleans up all entities from memory to prevent memory leaks
+GameWorld::~GameWorld() {
+    for (auto entity : entities) {
+        delete entity;
     }
+    entities.clear();
+    players.clear();
 }
 
-void GameWorld::removeEntity(Entity* entity) {
-    // Part 2: مسح الـ entity من الـ vector
-    entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
-}
+// Part 2 - pending
+// spawnEntity: adds a new entity to the game world
+// removeEntity: removes an entity from the game world
 
+// Part 3 - pending
+// update: updates all entities every frame
+
+// Part 4 - Abnob
+// detectCollisions: checks for collisions using PhysicsEngine every frame
 void GameWorld::detectCollisions() {
-    // Part 4: نداء محرك الفيزياء
     if (physicsEngine) {
-        // بنفترض إن محرك الفيزياء فيه دالة اسمها checkCollisions
-        // physicsEngine->checkCollisions(entities); 
-        std::cout << "Checking collisions for all entities..." << std::endl;
+        cout << "Checking collisions for all entities..." << endl;
     }
 }
 
+// Part 4 - Abnob
+// update: calls detectCollisions every frame
 void GameWorld::update(float deltaTime) {
-    // Part 3: تحديث كل الـ entities
     for (Entity* entity : entities) {
         if (entity) entity->update(deltaTime);
     }
-
-    // Part 4: استدعاء كشف التصادم كل فريم
     detectCollisions();
-}
-using namespace std;
-int main() {
-    cout << "this is my team h3h3h3 " << endl;
-    return 0;
 }

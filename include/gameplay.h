@@ -1,26 +1,33 @@
-#ifndef GAMEWORLD_H
-#define GAMEWORLD_H
-
+#pragma once
 #include <vector>
-#include "Entity.h" 
+#include "Entity.h"
 #include "Player.h"
 
-// Forward declaration عشان الـ compiler يعرف إن فيه كلاس بالاسم ده
-class PhysicsEngine; 
+using namespace std;
 
+// Forward declaration
+class PhysicsEngine;
+
+// Part 1 - Amy
+// GameWorld: main class that contains all entities and players
 class GameWorld {
 private:
-    std::vector<Entity*> entities; // Part 1
-    std::vector<Player*> players;  // Part 1
-    PhysicsEngine* physicsEngine;  // Part 4: الربط بمحرك الفيزياء
+    vector<Entity*> entities;
+    vector<Player*> players;
+
+    // Part 4 - Abnob
+    PhysicsEngine* physicsEngine;
 
 public:
-    // Constructor بياخد محرك الفيزياء
+    // Part 1 - Amy
     GameWorld(PhysicsEngine* engine);
+    ~GameWorld();
 
-    void spawnEntity(Entity* entity);  // Part 2
-    void removeEntity(Entity* entity); // Part 2
-    void update(float deltaTime);      // Part 3
-    void detectCollisions();           // Part 4: دالة كشف التصادم
+    // Part 2 - pending
+
+    // Part 3 - pending
+
+    // Part 4 - Abnob
+    void update(float deltaTime);
+    void detectCollisions();
 };
-#endif
