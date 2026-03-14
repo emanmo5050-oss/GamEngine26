@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\EMAN MOHAMAD KAMAL\Desktop\CS-1\semester_2\Programming 2\GamEngine26\src\core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\EMAN MOHAMAD KAMAL\Desktop\CS-1\semester_2\Programming 2\GamEngine26\src\gameplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\EMAN MOHAMAD KAMAL\Desktop\CS-1\semester_2\Programming 2\GamEngine26\src\network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\EMAN MOHAMAD KAMAL\Desktop\CS-1\semester_2\Programming 2\GamEngine26\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{50A9C681-C359-35AB-879E-698AAC034375}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
