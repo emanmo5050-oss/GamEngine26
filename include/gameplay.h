@@ -9,7 +9,6 @@ using namespace std;
 class PhysicsEngine;
 
 // Part 1 - Amy
-// GameWorld: main class that contains all entities and players
 class GameWorld {
 private:
     vector<Entity*> entities;
@@ -23,7 +22,9 @@ public:
     GameWorld(PhysicsEngine* engine);
     ~GameWorld();
 
-    // Part 2 - pending
+    // Part 2 - Haneen
+    void spawnEntity(Entity* entity);
+    void removeEntity(Entity* entity);
 
     // Part 3 - pending
 
