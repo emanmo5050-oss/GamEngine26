@@ -1,35 +1,35 @@
-#ifndef CORE_H
-#define CORE_H
- // Here we will define all the functions you wrote in the core.cpp 
- //so that other tems can use them without referring to the long code.
-
-#endif
-
 // core.h
+// Task 1: Engine Class (Improved Version)
 #pragma once
 #include <iostream>
 #include <atomic>
-using namespace std;
+#include "EntityManager.h"
+#include "PhysicsEngine.h"
 
 class Engine {
 private:
-    // Singleton: private constructor & deleted copy
+    // Singleton Pattern
     Engine();
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
 
-    static Engine* instance;       // the one and only instance
-    atomic<bool> running;          // thread-safe stop flag
+    static Engine* instance;
+
+    std::atomic<bool> running{false};
+
+    // Subsystems
+    EntityManager entityManager;
+    PhysicsEngine physicsEngine;
 
 public:
-    static Engine* getInstance();  // global access point
+    static Engine* getInstance();
 
     // Lifecycle
     void init();
     void run();
     void shutdown();
 
-    // Loop steps (called inside run())
+    // Game Loop
     void processInput();
     void updatePhysics();
     void updateGameLogic();
@@ -37,4 +37,8 @@ public:
     void render();
 
     bool isRunning() const;
+
+    // Getters
+    EntityManager& getEntityManager() { return entityManager; }
+    PhysicsEngine& getPhysicsEngine() { return physicsEngine; }
 };
