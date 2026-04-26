@@ -5,14 +5,18 @@
 #include <string>
 #include <atomic>
 #pragma comment(lib, "ws2_32.lib")
+
 using namespace std;
 
 #define PORT 5555
-#define SERVER_IP "127.0.0.1"  // Change to server's IP for LAN play
+#define SERVER_IP "127.0.0.1"  // Change to server's IP for LAN
 
 atomic<bool> running(true);
+int myPlayerID = 0;
+string myRole = "";
+int score = 0;
 
-// ─── Receive Thread ───────────────────────────────────────────────
+// ─── Handle incoming messages from server ────────────────────────
 void receiveMessages(SOCKET sock) {
     char buffer[1024];
     while (running) {
@@ -23,30 +27,57 @@ void receiveMessages(SOCKET sock) {
             running = false;
             break;
         }
+
         string msg(buffer, bytesReceived);
-        cout << "\n[Player] " << msg << "\n> ";
+
+        // Role assignment from server
+        if (msg.substr(0, 5) == "ROLE:") {
+            // Format: ROLE:PlayerID:ROLE
+            myPlayerID = msg[5] - '0';
+            myRole = msg.substr(7);
+            cout << "\n You are Player " << myPlayerID << " | Role: " << myRole << "\n";
+            if (myRole == "TOP")
+                cout << "Controls: A/D to slide | F to shoot\n";
+            else
+                cout << "Controls: SPACE to jump\n";
+        }
+        // Game start signal
+        else if (msg == "SERVER:START") {
+            cout << "\n Both players connected! Game is starting...\n> ";
+        }
+        // Score update
+        else if (msg.substr(0, 6) == "SCORE:") {
+            score = stoi(msg.substr(6));
+            cout << "\n Score: " << score << "\n> ";
+        }
+        // Another player left
+        else if (msg.substr(0, 19) == "SERVER:PLAYER_LEFT:") {
+            cout << "\n Other player disconnected.\n";
+            running = false;
+        }
+        // State updates (movement, actions)
+        else if (msg.substr(0, 6) == "STATE:") {
+            cout << "\n[UPDATE] " << msg << "\n> ";
+        }
+
         cout.flush();
     }
 }
 
-// ─── Main (Connect + Send) ────────────────────────────────────────
+// ─── Send packet to server ────────────────────────────────────────
+void sendPacket(SOCKET sock, const string& action, int x, int y) {
+    // Format: PlayerID:Action:X:Y
+    string packet = to_string(myPlayerID) + ":" + action + ":" + to_string(x) + ":" + to_string(y);
+    send(sock, packet.c_str(), packet.size(), 0);
+}
+
+// ─── Main ─────────────────────────────────────────────────────────
 int main() {
-    // 1. Init Winsock
     WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        cerr << "WSAStartup failed.\n";
-        return 1;
-    }
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    // 2. Create socket
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == INVALID_SOCKET) {
-        cerr << "Socket creation failed.\n";
-        WSACleanup();
-        return 1;
-    }
 
-    // 3. Connect to server
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(PORT);
@@ -58,22 +89,14 @@ int main() {
         WSACleanup();
         return 1;
     }
+
     cout << "Connected to server at " << SERVER_IP << ":" << PORT << "\n";
+    cout << "Waiting for role assignment...\n";
 
-    // 4. Ask for username
-    string username;
-    cout << "Enter your username: ";
-    getline(cin, username);
-
-    // Announce join to other players
-    string joinMsg = username + " has joined the game!";
-    send(sock, joinMsg.c_str(), joinMsg.size(), 0);
-
-    // 5. Start receive thread
+    // Start receive thread
     thread recvThread(receiveMessages, sock);
 
-    // 6. Send loop (game input)
-    cout << "Commands: MOVE <x> <y> | ATTACK | CHAT <message> | QUIT\n";
+    // Input loop
     while (running) {
         cout << "> ";
         string input;
@@ -83,15 +106,23 @@ int main() {
             running = false;
             break;
         }
-
         if (input.empty()) continue;
 
-        // Format: "username:command"
-        string packet = username + ":" + input;
-        send(sock, packet.c_str(), packet.size(), 0);
+        // Player 1 (TOP) controls
+        if (myRole == "TOP") {
+            if (input == "A")       sendPacket(sock, "SLIDE", -1, 0);
+            else if (input == "D")  sendPacket(sock, "SLIDE", 1, 0);
+            else if (input == "F")  sendPacket(sock, "SHOOT", 0, 0);
+        }
+        // Player 2 (BOTTOM) controls
+        else if (myRole == "BOTTOM") {
+            if (input == "SPACE")   sendPacket(sock, "JUMP", 0, 1);
+        }
+
+        // Score a point
+        if (input == "SCORED")      sendPacket(sock, "SCORED", 0, 0);
     }
 
-    // 7. Cleanup
     closesocket(sock);
     WSACleanup();
     if (recvThread.joinable())
