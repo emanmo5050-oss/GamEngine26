@@ -1,3 +1,0 @@
-C:/Users/EMAN MOHAMAD KAMAL/Desktop/CS-1/semester_2/Programming 2/GamEngine26/build/CMakeFiles/GamEngine26.dir
-C:/Users/EMAN MOHAMAD KAMAL/Desktop/CS-1/semester_2/Programming 2/GamEngine26/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/EMAN MOHAMAD KAMAL/Desktop/CS-1/semester_2/Programming 2/GamEngine26/build/CMakeFiles/ZERO_CHECK.dir
