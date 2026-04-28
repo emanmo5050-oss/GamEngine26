@@ -65,3 +65,15 @@ int Entity::calculateArea() const {
         default:                        return 1;
     }
 }
+void Entity::deserialize(const std::string& data) {
+    std::stringstream ss(data);
+    std::string idStr, typeChar, xStr, yStr, activeStr;
+    std::getline(ss, idStr, ':');
+    std::getline(ss, typeChar, ':');
+    std::getline(ss, xStr, ':');
+    std::getline(ss, yStr, ':');
+    std::getline(ss, activeStr, ':');
+    position.x = std::stoi(xStr);
+    position.y = std::stoi(yStr);
+    active = (activeStr == "1");
+}
