@@ -52,7 +52,8 @@ void EntityManager::renderAll(std::vector<std::vector<char>>& grid) const {
     std::lock_guard<std::mutex> lock(mutex);
     for (const auto& e : entities) {
         if (e->isActive()) {
-            e->render(grid);
+            Vec2 pos = e->getPosition();
+grid[pos.y][pos.x] = e->display();
         }
     }
 }

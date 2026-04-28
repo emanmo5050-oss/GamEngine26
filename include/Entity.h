@@ -74,6 +74,7 @@ public:
     //  Serialises this entity's state into "ID:Type:X:Y:Active"
     //  Used by serializeAll() in EntityManager.
     std::string serialize() const;
+    void deserialize(const std::string& data);
 
     // ── Shared Getters (used by every team) ───────────────────────
     Vec2       getPosition()  const { return position; }
@@ -87,6 +88,7 @@ public:
 
     // Health getters/setters — Gameplay Task 4 enforces private access
     int  getHealth()          const { return health; }
+    Vec2 getVelocity() const { return velocity; }
     void setHealth(int hp)          { health = hp;   }
     void takeDamage(int dmg)        { health -= dmg; if (health <= 0) active = false; }
 
