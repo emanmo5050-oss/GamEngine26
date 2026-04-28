@@ -1,5 +1,4 @@
 // Projectile.h
-// Task 2: Entity System - Improved
 #pragma once
 #include "Entity.h"
 
@@ -10,12 +9,11 @@ private:
 public:
     Projectile(int id, Vec2 pos, Vec2 dir, int dmg = 25);
 
-    void update(PhysicsEngine& physics) override;
-    void render(std::vector<std::vector<char>>& grid) const override;
     void onCollision(Entity* other) override;
+    void move(Vec2 dir) override;
 
-    std::string serialize() const override;
-    void deserialize(const std::string& data) override;
+    virtual std::string serialize() const override;
+    virtual void deserialize(const std::string& data) override;
 
     int getDamage() const { return damage; }
 };

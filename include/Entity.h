@@ -73,8 +73,8 @@ public:
     // ── [ NETWORK TASK 2 — Network team's responsibility ] ────────
     //  Serialises this entity's state into "ID:Type:X:Y:Active"
     //  Used by serializeAll() in EntityManager.
-    std::string serialize() const;
-    void deserialize(const std::string& data);
+   virtual std::string serialize() const;
+virtual void deserialize(const std::string& data);
 
     // ── Shared Getters (used by every team) ───────────────────────
     Vec2       getPosition()  const { return position; }

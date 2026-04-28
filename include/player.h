@@ -3,8 +3,10 @@
 
 #pragma once
 #include "Entity.h"
+#include "PhysicsEngine.h"
 #include <string>
 #include <memory>
+#include <vector>
 
 class Projectile;
 
@@ -16,16 +18,15 @@ private:
 public:
     Player(int id, Vec2 pos, const std::string& name);
 
-    void update(PhysicsEngine& physics) override;
-    void render(std::vector<std::vector<char>>& grid) const override;
     void onCollision(Entity* other) override;
 
-    std::string serialize() const override;
-    void deserialize(const std::string& data) override;
+    virtual std::string serialize() const override;
+    virtual void deserialize(const std::string& data) override;
 
-    void move(Vec2 dir);
+    void move(Vec2 dir) override;
     std::unique_ptr<Projectile> shoot();
 
     int getScore() const { return score; }
+    void addScore(int pts) { score += pts; }
     const std::string& getUsername() const { return username; }
 };
