@@ -12,8 +12,8 @@ void EntityManager::addEntity(std::unique_ptr<Entity> entity) {
     std::lock_guard<std::mutex> lock(mutex);
     entities.push_back(std::move(entity));
     
-    std::cout << "[EntityManager] Added " << entities.back()->getType() 
-              << " (ID: " << entities.back()->getId() << ")\n";
+    std::cout << "[EntityManager] Added entity (ID: " 
+              << entities.back()->getId() << ")\n";
 }
 
 void EntityManager::removeEntity(int id) {

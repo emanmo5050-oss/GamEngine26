@@ -4,29 +4,41 @@
 
 Player::Player(int id, Vec2 pos, const std::string& name)
     : Entity(EntityType::BOTTOM_PLAYER, pos), username(name) {
-    setHealth(3);  // Player starts with 3 health
+    setHealth(1);  // One hit = dead
 }
 
 void Player::onCollision(Entity* other) {
     if (!other || !other->isActive()) return;
 
     if (other->getType() == EntityType::INSECT) {
-        takeDamage(1);
+        loseLife();
     }
 }
 
 void Player::move(Vec2 dir) {
-    Entity::move(dir);
+    if (isTopPlayer) {
+        // Top player slides left/right only
+        velocity.x = dir.x;
+        velocity.y = 0;
+        position.x += velocity.x;
+        clampPosition();
+    } else {
+        // Bottom player moves horizontally
+        velocity.x = dir.x;
+        position.x += velocity.x;
+        clampPosition();
+    }
 }
 
 std::unique_ptr<Projectile> Player::shoot() {
-    Vec2 bulletDir = {0, 1};  // shoots downward
-    return std::make_unique<Projectile>(getId() * 100 + 1, position, bulletDir, 25);
+    // Shoots downward from ceiling
+    Vec2 bulletDir = {0, 1};
+    return std::make_unique<Projectile>(getId() * 100 + 1, position, bulletDir, 1);
 }
 
 std::string Player::serialize() const {
     std::ostringstream ss;
-    ss << Entity::serialize() << ":" << username << ":" << score;
+    ss << Entity::serialize() << ":" << username << ":" << score << ":" << lives;
     return ss.str();
 }
 
