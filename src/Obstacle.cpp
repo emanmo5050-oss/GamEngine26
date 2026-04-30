@@ -1,34 +1,32 @@
-// Obstacle.cpp
-// Task 2: Entity System - Improved
 #include "Obstacle.h"
-#include <sstream>
 
-Obstacle::Obstacle(int id, Vec2 pos) : Entity(id, pos, '#', "Obstacle") {}
+Obstacle::Obstacle(int id, Vec2 pos)
+    : Entity(EntityType::INSECT, pos) {
+    setHealth(999); // Obstacles are indestructible
+}
 
-void Obstacle::update(PhysicsEngine& physics) {} // ثابت
-
-void Obstacle::render(std::vector<std::vector<char>>& grid) const {
-    auto p = position;
-    if (p.x >= 0 && p.x < 20 && p.y >= 0 && p.y < 20)
-        grid[p.y][p.x] = symbol;
+void Obstacle::move(Vec2 dir) {
+    (void)dir;
+    // Obstacles don't move — static objects
 }
 
 void Obstacle::onCollision(Entity* other) {
-    if (other->getType() == "Player" || other->getType() == "Projectile") {
-        other->takeDamage(15);
-        // دفع اللاعب للخلف
-        other->setPosition(other->getPosition() - other->getVelocity());
+    if (!other || !other->isActive()) return;
+
+    if (other->getType() == EntityType::BOTTOM_PLAYER ||
+        other->getType() == EntityType::PROJECTILE) {
+        other->takeDamage(1);
+        // Push entity back
+        Vec2 pos = other->getPosition();
+        Vec2 vel = other->getVelocity();
+        other->setPosition({pos.x - vel.x, pos.y - vel.y});
     }
 }
 
 std::string Obstacle::serialize() const {
-    std::stringstream ss;
-    ss << "O," << id << "," << position.x << "," << position.y;
-    return ss.str();
+    return Entity::serialize();
 }
 
 void Obstacle::deserialize(const std::string& data) {
-    std::stringstream ss(data.substr(2));
-    char c;
-    ss >> id >> c >> position.x >> c >> position.y;
+    Entity::deserialize(data);
 }

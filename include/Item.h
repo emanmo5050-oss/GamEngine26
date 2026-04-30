@@ -1,19 +1,18 @@
-// Item.h
-// Task 2: Entity System - Improved
 #pragma once
 #include "Entity.h"
 
 class Item : public Entity {
 private:
-    int points = 30;
+    int points = 10;
 
 public:
-    Item(int id, Vec2 pos, int pts = 30);
+    Item(int id, Vec2 pos, int pts = 10);
 
-    void update(PhysicsEngine& physics) override;
-    void render(std::vector<std::vector<char>>& grid) const override;
+    void move(Vec2 dir) override;
     void onCollision(Entity* other) override;
 
-    std::string serialize() const override;
-    void deserialize(const std::string& data) override;
+    virtual std::string serialize() const override;
+    virtual void deserialize(const std::string& data) override;
+
+    int getPoints() const { return points; }
 };

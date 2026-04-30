@@ -1,35 +1,37 @@
-// PowerUp.cpp
-// Task 2: Entity System - Improved
 #include "PowerUp.h"
-#include <sstream>
+#include "core.h"
 
-PowerUp::PowerUp(int id, Vec2 pos, int val)
-    : Entity(id, pos, '+', "PowerUp"), value(val) {}
-
-void PowerUp::update(PhysicsEngine& physics) {
-    // يمكن إضافة تأثير بصري بسيط لاحقاً
+PowerUp::PowerUp(int id, Vec2 pos, int ammo)
+    : Entity(EntityType::INSECT, pos), ammoValue(ammo) {
+    setHealth(1);
 }
 
-void PowerUp::render(std::vector<std::vector<char>>& grid) const {
-    auto p = position;
-    if (p.x >= 0 && p.x < 20 && p.y >= 0 && p.y < 20)
-        grid[p.y][p.x] = symbol;
+void PowerUp::move(Vec2 dir) {
+    (void)dir;
+    // PowerUp slowly falls down
+    velocity = {0, 1};
+    position = position + velocity;
+    clampPosition();
+    // Deactivate if it reaches the floor
+    if (getPosition().y >= 18) setActive(false);
 }
 
 void PowerUp::onCollision(Entity* other) {
-    if (other->getType() == "Player") {
-        active = false;
+    if (!other || !other->isActive()) return;
+
+    if (other->getType() == EntityType::BOTTOM_PLAYER) {
+        if (auto* engine = Engine::getInstance()) {
+            engine->depositAmmo(ammoValue);
+            engine->addScore(10);
+        }
+        setActive(false);
     }
 }
 
 std::string PowerUp::serialize() const {
-    std::stringstream ss;
-    ss << "PU," << id << "," << position.x << "," << position.y << "," << value;
-    return ss.str();
+    return Entity::serialize();
 }
 
 void PowerUp::deserialize(const std::string& data) {
-    std::stringstream ss(data.substr(3));
-    char c;
-    ss >> id >> c >> position.x >> c >> position.y >> c >> value;
+    Entity::deserialize(data);
 }

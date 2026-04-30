@@ -1,19 +1,18 @@
-// PowerUp.h
-// Task 2: Entity System - Improved
 #pragma once
 #include "Entity.h"
 
 class PowerUp : public Entity {
 private:
-    int value = 50;
+    int ammoValue = 6;
 
 public:
-    PowerUp(int id, Vec2 pos, int val = 50);
+    PowerUp(int id, Vec2 pos, int ammo = 6);
 
-    void update(PhysicsEngine& physics) override;
-    void render(std::vector<std::vector<char>>& grid) const override;
+    void move(Vec2 dir) override;
     void onCollision(Entity* other) override;
 
-    std::string serialize() const override;
-    void deserialize(const std::string& data) override;
+    virtual std::string serialize() const override;
+    virtual void deserialize(const std::string& data) override;
+
+    int getAmmoValue() const { return ammoValue; }
 };
