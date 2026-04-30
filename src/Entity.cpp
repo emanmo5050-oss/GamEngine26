@@ -1,9 +1,10 @@
 #include "Entity.h"
 #include <stdexcept>
 #include <sstream>
- 
+#include <cstdlib>
+
 int Entity::nextId = 0;
- 
+
 Entity::Entity(EntityType type, Vec2 startPos)
     : type(type)
     , position(startPos)
@@ -12,8 +13,7 @@ Entity::Entity(EntityType type, Vec2 startPos)
     , health(1)
     , id(nextId++)
 {}
- 
-// [ CORE TASK 2 — display() ]
+
 char Entity::display() const {
     switch (type) {
         case EntityType::TOP_PLAYER:    return 'V';
@@ -23,39 +23,72 @@ char Entity::display() const {
         default:                        return '?';
     }
 }
- 
-// [ CORE TASK 2 — serialize() ]
+
 std::string Entity::serialize() const {
     std::ostringstream ss;
     ss << id << ':' << display() << ':' << position.x << ':' << position.y << ':' << (active ? 1 : 0);
     return ss.str();
 }
- 
-// [ GAMEPLAY TASK 2 — move() — Yassin Athula implements this ]
+
 void Entity::move(Vec2 dir) {
-    (void)dir;
+    const int GRAVITY = 1;
+    switch (type) {
+        case EntityType::TOP_PLAYER:
+            velocity.x = dir.x;
+            position.x += velocity.x;
+            break;
+        case EntityType::BOTTOM_PLAYER:
+            velocity.x = dir.x;
+            velocity.y += GRAVITY;
+            position = position + velocity;
+            break;
+        case EntityType::INSECT:
+            velocity.x = -1;
+            if (rand() % 6 == 0)
+                velocity.y = (rand() % 3) - 1;
+            position = position + velocity;
+            break;
+        case EntityType::PROJECTILE:
+            position.y += 1;
+            break;
+    }
+    clampPosition();
 }
- 
-// [ GAMEPLAY TASK 2 — clampPosition() — Yassin Athula implements this ]
-void Entity::clampPosition() {}
- 
-// [ GAMEPLAY TASK 1 — onCollision() — Eman ]
+
+void Entity::clampPosition() {
+    if (position.x < 0)  position.x = 0;
+    if (position.x > 19) position.x = 19;
+    if (position.y < 0)  position.y = 0;
+    if (position.y > 19) position.y = 19;
+
+    if (type == EntityType::TOP_PLAYER)
+        position.y = 0;
+
+    if (type == EntityType::BOTTOM_PLAYER && position.y >= 19) {
+        position.y = 19;
+        velocity.y = 0;
+    }
+    if (type == EntityType::INSECT && position.x < 0)
+        active = false;
+    if (type == EntityType::PROJECTILE && position.y >= 19)
+        active = false;
+}
+
 void Entity::onCollision(Entity* other) {
     if (!other || !other->isActive()) return;
- 
+
     if (type == EntityType::PROJECTILE && other->getType() == EntityType::INSECT) {
         other->takeDamage(1);
         setActive(false);
         return;
     }
- 
+
     if (type == EntityType::INSECT && other->getType() == EntityType::BOTTOM_PLAYER) {
         other->takeDamage(1);
         return;
     }
 }
- 
-// [ GAMEPLAY TASK 1 — calculateArea() — Eman ]
+
 int Entity::calculateArea() const {
     switch (type) {
         case EntityType::TOP_PLAYER:    return 3;
@@ -65,6 +98,7 @@ int Entity::calculateArea() const {
         default:                        return 1;
     }
 }
+
 void Entity::deserialize(const std::string& data) {
     std::stringstream ss(data);
     std::string idStr, typeChar, xStr, yStr, activeStr;

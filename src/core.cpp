@@ -2,11 +2,15 @@
 #include "Entity.h"
 #include "EntityManager.h"
 #include "PhysicsEngine.h"
+#include "EntityFactory.h"
+#include "Player.h"
+#include "Enemy.h"
 #include <thread>
 #include <chrono>
 #include <iostream>
 #include <vector>
 #include <conio.h>
+#include <windows.h>
 
 Engine* Engine::instance = nullptr;
 
@@ -31,7 +35,9 @@ Engine& Engine::getInstance() {
 }
 
 void Engine::clearScreen() {
-    system("cls");  // Windows clear — more reliable than ANSI
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD topLeft = {0, 0};
+    SetConsoleCursorPosition(hConsole, topLeft);
 }
 
 void Engine::drawGrid(const std::vector<Entity*>& entities) {
@@ -66,7 +72,7 @@ void Engine::drawGrid(const std::vector<Entity*>& entities) {
 
 void Engine::drawHUD() {
     std::cout << "\nScore: " << score
-              << "  |  Ammo: " << ammo
+              << "  |  Ammo: Infinite"
               << "  |  P1 (Triangle): alive"
               << "  |  P2 (Ground): alive\n\n";
     std::cout << "P1: [A] Left  [D] Right  [S] Shoot\n";
@@ -85,16 +91,61 @@ void Engine::render() {
 }
 
 void Engine::processInput() {
-    if (!_kbhit()) return;
-    char key = static_cast<char>(toupper(_getch()));
-    if (key == 'Q' || key == 27) running = false;
+    if (_kbhit()) {
+        char key = static_cast<char>(toupper(_getch()));
+
+        Player* top = nullptr;
+        Player* bottom = nullptr;
+        for (auto& e : entityManager->getEntities()) {
+            if (auto* p = dynamic_cast<Player*>(e.get())) {
+                if (p->isTop()) top = p;
+                else bottom = p;
+            }
+        }
+
+        switch (key) {
+            case 'A': if (top) top->move({-1, 0}); break;
+            case 'D': if (top) top->move({1, 0});  break;
+            case 'S':
+                if (top) {
+                    auto proj = top->shoot();
+                    if (proj) entityManager->addEntity(std::move(proj));
+                }
+                break;
+            case 'H': if (bottom) bottom->move({-1, 0}); break;
+            case 'L': if (bottom) bottom->move({1, 0});  break;
+            case ' ':
+                if (bottom)
+                    bottom->setVelocity({0, -5});
+                break;
+            case 'Q': case 27: running = false; break;
+        }
+    }
 }
 
 void Engine::updatePhysics() {
-    // TODO: connect to real physics once entities are spawned
+    for (auto& e : entityManager->getEntities()) {
+        if (e && e->isActive())
+            e->move({0, 0});
+    }
+    physicsEngine->detectAndResolveCollisions(entityManager->getEntities());
 }
 
 void Engine::run() {
+    auto p1 = EntityFactory::createEntity("Player", 1, {9, 0}, "Top");
+    if (p1) {
+        static_cast<Player*>(p1.get())->setAsTopPlayer(true);
+        entityManager->addEntity(std::move(p1));
+    }
+
+    auto p2 = EntityFactory::createEntity("Player", 2, {9, 19}, "Bottom");
+    if (p2) {
+        static_cast<Player*>(p2.get())->setAsTopPlayer(false);
+        entityManager->addEntity(std::move(p2));
+    }
+
+    entityManager->addEntity(EntityFactory::createEntity("Enemy", 3, {18, 10}));
+
     while (running) {
         processInput();
         updatePhysics();

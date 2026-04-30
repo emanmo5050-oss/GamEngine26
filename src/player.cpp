@@ -4,9 +4,9 @@
 
 Player::Player(int id, Vec2 pos, const std::string& name)
     : Entity(EntityType::BOTTOM_PLAYER, pos), username(name) {
-    setHealth(1);  // One hit = dead
+    setHealth(1);
+    lives = 1;
 }
-
 void Player::onCollision(Entity* other) {
     if (!other || !other->isActive()) return;
 

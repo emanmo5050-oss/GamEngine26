@@ -35,7 +35,10 @@ public:
 
     // Role
     bool isTop() const { return isTopPlayer; }
-    void setAsTopPlayer(bool val) { isTopPlayer = val; }
+    void setAsTopPlayer(bool val) { 
+    isTopPlayer = val; 
+    type = val ? EntityType::TOP_PLAYER : EntityType::BOTTOM_PLAYER;
+}
 
     // Username
     const std::string& getUsername() const { return username; }
