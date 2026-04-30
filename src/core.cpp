@@ -27,7 +27,8 @@
 // ── These headers will be provided by Gameplay Task 4 ─────────────
 // #include "EntityManager.h"
 // #include "PhysicsEngine.h"
-
+#include <thread>
+#include <chrono>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -218,7 +219,7 @@ void Engine::render() {
     // ── 2. Fetch all active entities from EntityManager ───────────
     //  When Gameplay Task 4 delivers EntityManager, replace stub:
     //    std::vector<Entity*> entities = entityManager->getActiveEntities();
-    std::vector<Entity*> entities = {};  // TODO: replace stub with real call
+    std::vector<Entity*> entities = entityManager->getActiveEntities();  // TODO: replace stub with real call
 
     // ── 3. Draw the 20x20 arena grid ──────────────────────────────
     drawGrid(entities);
@@ -299,12 +300,11 @@ Engine::~Engine() {
 //    }
 // ================================================================
 void Engine::run() {
-    // TODO: Core Task 1 (teammate) ──────────────────────────────────
     while (running) {
         processInput();
         updatePhysics();
         render();
-        // Network Team: call serializeAll() here and broadcast
+        std::this_thread::sleep_for(std::chrono::milliseconds(80));
     }
 }
 
