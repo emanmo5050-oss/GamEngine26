@@ -1,15 +1,12 @@
 #include <iostream>
 #include <algorithm>
 #include "gameplay.h"
+#include "PhysicsEngine.h"
 
-using namespace std;
-
-// Part 1 - Amy
-// Constructor: initializes the GameWorld with a PhysicsEngine
+// Part 1 - Eman
 GameWorld::GameWorld(PhysicsEngine* engine) : physicsEngine(engine) {}
 
-// Part 1 - Amy
-// Destructor: cleans up all entities from memory to prevent memory leaks
+// Part 1 - Eman
 GameWorld::~GameWorld() {
     for (auto entity : entities) {
         delete entity;
@@ -18,38 +15,31 @@ GameWorld::~GameWorld() {
     players.clear();
 }
 
-// Part 2 - haneen
-// spawnEntity: adds a new entity to the game world
+// Part 2 - Haneen
 void GameWorld::spawnEntity(Entity* entity) {
     if (entity != nullptr) {
         entities.push_back(entity);
     }
 }
 
-// removeEntity: removes an entity from the game world
 void GameWorld::removeEntity(Entity* entity) {
-    auto it = find(entities.begin(), entities.end(), entity);
+    auto it = std::find(entities.begin(), entities.end(), entity);
     if (it != entities.end()) {
         entities.erase(it);
     }
 }
 
-// Part 3 - pending
-// update: updates all entities every frame
-
 // Part 4 - Abnob
-// detectCollisions: checks for collisions using PhysicsEngine every frame
 void GameWorld::detectCollisions() {
     if (physicsEngine) {
-        cout << "Checking collisions for all entities..." << endl;
+        std::cout << "Checking collisions...\n";
     }
 }
 
-// Part 4 - Abnob
-// update: calls detectCollisions every frame
-void GameWorld::update(float deltaTime) {
+void GameWorld::update() {
     for (Entity* entity : entities) {
-       // if (entity) entity->update(deltaTime);     // Note: waiting for Yassin to finish Entity class with deltaTime parameter
+        if (entity && entity->isActive())
+            entity->move({0, 0});
     }
     detectCollisions();
 }
