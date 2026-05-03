@@ -57,7 +57,7 @@ void Entity::move(Vec2 dir) {
 
 void Entity::clampPosition() {
     if (position.x < 0)  position.x = 0;
-    if (position.x > 19) position.x = 19;
+    if (position.x > 39) position.x = 39;
     if (position.y < 0)  position.y = 0;
     if (position.y > 19) position.y = 19;
 
@@ -68,8 +68,13 @@ void Entity::clampPosition() {
         position.y = 19;
         velocity.y = 0;
     }
-    if (type == EntityType::INSECT && position.x < 0)
-        active = false;
+
+    if (type == EntityType::INSECT) {
+        if (position.x < 0)  position.x = 0;
+        if (position.x > 39) position.x = 39;
+        if (position.y > 19) position.y = 19;
+    }
+
     if (type == EntityType::PROJECTILE && position.y >= 19)
         active = false;
 }
@@ -91,9 +96,9 @@ void Entity::onCollision(Entity* other) {
 
 int Entity::calculateArea() const {
     switch (type) {
-        case EntityType::TOP_PLAYER:    return 3;
+        case EntityType::TOP_PLAYER:    return 1;
         case EntityType::BOTTOM_PLAYER: return 1;
-        case EntityType::INSECT:        return 2;
+        case EntityType::INSECT:        return 1;
         case EntityType::PROJECTILE:    return 1;
         default:                        return 1;
     }

@@ -8,8 +8,7 @@ Enemy::Enemy(int id, Vec2 pos)
 
 void Enemy::move(Vec2 dir) {
     (void)dir;
-    // Enemy always moves left, slight random vertical movement
-    velocity = {-1, (std::rand() % 3) - 1};
+    velocity = {(std::rand() % 3) - 1, 2};  
     position = position + velocity;
     clampPosition();
 }

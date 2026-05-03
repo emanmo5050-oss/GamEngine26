@@ -30,7 +30,7 @@ void Player::move(Vec2 dir) {
     }
 }
 
-std::unique_ptr<Projectile> Player::shoot() {
+std::unique_ptr<Entity> Player::shoot() {
     // Shoots downward from ceiling
     Vec2 bulletDir = {0, 1};
     return std::make_unique<Projectile>(getId() * 100 + 1, position, bulletDir, 1);

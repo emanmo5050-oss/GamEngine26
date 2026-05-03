@@ -11,5 +11,5 @@ public:
 
     // Called by EntityManager::updateAll()
     void updatePositions(std::vector<std::unique_ptr<Entity>>& entities);
-    void detectAndResolveCollisions(std::vector<std::unique_ptr<Entity>>& entities);
+    void detectAndResolveCollisions(const std::vector<std::unique_ptr<Entity>>& entities);
 };

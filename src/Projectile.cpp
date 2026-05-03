@@ -9,16 +9,16 @@ Projectile::Projectile(int id, Vec2 pos, Vec2 dir, int dmg)
 
 void Projectile::move(Vec2 dir) {
     (void)dir;
-    // Projectile ignores external dir — moves by its own velocity
-    position = position + velocity;
-    clampPosition();  // deactivates if out of bounds
+    position.y += 3;  
+    clampPosition();
 }
 
 void Projectile::onCollision(Entity* other) {
     if (!other || !other->isActive()) return;
 
     if (other->getType() == EntityType::INSECT) {
-        other->takeDamage(damage);
+        other->setHealth(0);
+        other->setActive(false);
         setActive(false);
     }
 }

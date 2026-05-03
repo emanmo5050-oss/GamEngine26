@@ -1,32 +1,8 @@
 #pragma once
 
-// ============================================================
-//  Entity.h  —  Base Entity Class Declaration
-//
-//  ┌─────────────────────────────────────────────────────┐
-//  │  WHO TOUCHES THIS FILE?                             │
-//  │                                                     │
-//  │  Core    Task 2  → implements display()   ← YOU    │
-//  │  Gameplay Task 1 → implements onCollision()         │
-//  │            Task 1 → implements calculateArea()      │
-//  │            Task 2 → implements move(), clamp()      │
-//  │            Task 4 → uses EntityFactory/Manager      │
-//  │  Network  Task 2  → uses serialize()                │
-//  └─────────────────────────────────────────────────────┘
-//
-//  Game Context:
-//    TOP_PLAYER    = Inverted triangle on ceiling, slides L/R, shoots
-//    BOTTOM_PLAYER = Ground player that jumps over insects
-//    INSECT        = Enemy coming from the right side (boxes/obstacles)
-//    PROJECTILE    = Bullet fired downward by the Top Player
-// ============================================================
-
 #include "Vec2.h"
 #include <string>
 
-// ------------------------------------------------------------------
-//  EntityType  —  Determines symbol, behaviour, and physics rules
-// ------------------------------------------------------------------
 enum class EntityType {
     TOP_PLAYER,     // Rendered as 'V'  — ceiling, X-axis only
     BOTTOM_PLAYER,  // Rendered as 'M'  — ground, can jump
@@ -34,30 +10,16 @@ enum class EntityType {
     PROJECTILE      // Rendered as '|'  — bullet from Top Player
 };
 
-// ------------------------------------------------------------------
-//  Entity  —  Abstract base for every object in the game world
-// ------------------------------------------------------------------
 class Entity {
 public:
     // ── Construction / Destruction ─────────────────────────────────
     Entity(EntityType type, Vec2 startPos);
     virtual ~Entity() = default;
 
-    // ── [ CORE TASK 2 — YOUR RESPONSIBILITY ] ─────────────────────
-    //  Returns the single ASCII character that represents this entity
-    //  on the 20x20 grid.
-    //
-    //  Mapping (do NOT change — Network team relies on these):
-    //    TOP_PLAYER    → 'V'
-    //    BOTTOM_PLAYER → 'M'
-    //    INSECT        → 'X'
-    //    PROJECTILE    → '|'
+    
     virtual char display() const;
 
-    // ── [ GAMEPLAY TASK 2 — Eman's friend's responsibility ] ──────
-    //  Moves the entity by `dir` (restricted per entity type).
-    //  Top Player:    only X component is applied
-    //  Bottom Player: both X and Y (jump = negative Y impulse)
+   
     virtual void move(Vec2 dir);
 
     //  Keeps position inside the 20x20 arena boundaries [0..19].

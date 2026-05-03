@@ -11,6 +11,8 @@
 #include <vector>
 #include <conio.h>
 #include <windows.h>
+#include <cstdlib>
+#include <ctime>
 
 Engine* Engine::instance = nullptr;
 
@@ -71,8 +73,7 @@ void Engine::drawGrid(const std::vector<Entity*>& entities) {
 }
 
 void Engine::drawHUD() {
-    std::cout << "\nScore: " << score
-              << "  |  Ammo: Infinite"
+    std::cout << "\nhhhh bro it's too easy!"
               << "  |  P1 (Triangle): alive"
               << "  |  P2 (Ground): alive\n\n";
     std::cout << "P1: [A] Left  [D] Right  [S] Shoot\n";
@@ -108,7 +109,7 @@ void Engine::processInput() {
             case 'D': if (top) top->move({1, 0});  break;
             case 'S':
                 if (top) {
-                    auto proj = top->shoot();
+                    std::unique_ptr<Entity> proj = top->shoot();
                     if (proj) entityManager->addEntity(std::move(proj));
                 }
                 break;
@@ -129,27 +130,60 @@ void Engine::updatePhysics() {
             e->move({0, 0});
     }
     physicsEngine->detectAndResolveCollisions(entityManager->getEntities());
+
+    // Check if any player is dead — stop the game
+    for (auto& e : entityManager->getEntities()) {
+        if (auto* p = dynamic_cast<Player*>(e.get())) {
+            if (!p->isActive()) {
+                running = false;
+            }
+        }
+    }
+
+    // Respawn enemy if no active enemy exists
+    bool hasEnemy = false;
+    for (auto& e : entityManager->getEntities()) {
+        if (e && e->isActive() && e->getType() == EntityType::INSECT)
+            hasEnemy = true;
+    }
+    if (!hasEnemy) {
+        score++;
+        entityManager->addEntity(EntityFactory::createEntity("Enemy", rand() % 1000, {rand() % 38 + 1, 1}));
+    }
 }
 
 void Engine::run() {
-    auto p1 = EntityFactory::createEntity("Player", 1, {9, 0}, "Top");
+    srand(time(nullptr));
+
+    auto p1 = EntityFactory::createEntity("Player", 1, {20, 0}, "Top");
+
+
     if (p1) {
         static_cast<Player*>(p1.get())->setAsTopPlayer(true);
         entityManager->addEntity(std::move(p1));
     }
 
-    auto p2 = EntityFactory::createEntity("Player", 2, {9, 19}, "Bottom");
+    auto p2 = EntityFactory::createEntity("Player", 2, {20, 19}, "Bottom");
     if (p2) {
         static_cast<Player*>(p2.get())->setAsTopPlayer(false);
         entityManager->addEntity(std::move(p2));
     }
 
-    entityManager->addEntity(EntityFactory::createEntity("Enemy", 3, {18, 10}));
-
+    entityManager->addEntity(EntityFactory::createEntity("Enemy", 3, {rand() % 38 + 1, 1}));
     while (running) {
         processInput();
         updatePhysics();
         render();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
     }
+
+    // Game Over screen
+    system("cls");
+    std::cout << "\n\n";
+    std::cout << "===============================================\n";
+    std::cout << "                Damn you lost!                 \n";
+    std::cout << "           really dude it's too easy           \n";
+    std::cout << "===============================================\n";
+    std::cout << "\nPress any key to exit...\n";
+    _getch();
 }

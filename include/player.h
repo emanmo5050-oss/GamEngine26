@@ -23,7 +23,7 @@ public:
     virtual std::string serialize() const override;
     virtual void deserialize(const std::string& data) override;
 
-    std::unique_ptr<Projectile> shoot();
+    std::unique_ptr<Entity> shoot();
 
     // Score
     int getScore() const { return score; }
